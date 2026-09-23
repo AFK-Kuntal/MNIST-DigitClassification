@@ -1,8 +1,7 @@
 import streamlit as st
 import numpy as np
 from tensorflow import keras
-from streamlit_drawable_canvas import st_canvas
-from PIL import Image
+from PIL import Image, ImageOps
 
 # ---------------------------------------------------
 # Page config
@@ -71,11 +70,14 @@ div.stButton > button:first-child:hover {
 </style>
 """
 
-st.markdown(page_style, unsafe_allow_html=True)
+st.markdown(
+    page_style,
+    unsafe_allow_html=True
+)
 
 
 # ---------------------------------------------------
-# Custom HTML Header
+# Header
 # ---------------------------------------------------
 
 html_temp = """
@@ -98,11 +100,14 @@ html_temp = """
     text-align: center;
     padding: 10px 0px;
 ">
-    Draw a digit from 0–9 in the canvas below and let our CNN classify it.
+    Upload an image of a handwritten digit and let our CNN classify it.
 </h4>
 """
 
-st.markdown(html_temp, unsafe_allow_html=True)
+st.markdown(
+    html_temp,
+    unsafe_allow_html=True
+)
 
 
 # ---------------------------------------------------
@@ -113,29 +118,34 @@ col1, col2 = st.columns([1, 1])
 
 
 # ---------------------------------------------------
-# Left column - Drawing canvas
+# Left column - Image upload
 # ---------------------------------------------------
 
 with col1:
 
-    st.markdown("### ✏️ Draw Your Digit")
+    st.markdown("### 📤 Upload Your Digit")
 
-    canvas_result = st_canvas(
-        fill_color="black",
-        stroke_width=22,
-        stroke_color="white",
-        background_color="black",
-        height=280,
-        width=280,
-        drawing_mode="freedraw",
-        key="canvas",
-        display_toolbar=True,
-        return_image_data=True
+    uploaded_file = st.file_uploader(
+        "Choose an image",
+        type=["png", "jpg", "jpeg"],
+        label_visibility="collapsed"
     )
 
-    st.caption(
-        "Draw one digit clearly inside the box."
-    )
+    if uploaded_file is not None:
+
+        img = Image.open(uploaded_file)
+
+        st.image(
+            img,
+            caption="Uploaded digit",
+            width=280
+        )
+
+    else:
+
+        st.info(
+            "Upload a PNG or JPG image containing one handwritten digit."
+        )
 
 
 # ---------------------------------------------------
@@ -152,39 +162,55 @@ with col2:
     )
 
     st.caption(
-        "Click Predict after drawing your digit."
+        "Upload an image first, then click Predict."
     )
 
     if predict_btn:
 
-        if canvas_result.image_data is not None:
+        if uploaded_file is not None:
 
             # ---------------------------------------
-            # Convert canvas image
+            # Open image
             # ---------------------------------------
 
-            img = Image.fromarray(
-                canvas_result.image_data.astype("uint8"),
-                mode="RGBA"
-            )
+            img = Image.open(uploaded_file)
 
-            # RGBA → grayscale
+
+            # ---------------------------------------
+            # Convert image to grayscale
+            # ---------------------------------------
+
             img = img.convert("L")
 
-            # Resize 280x280 → 28x28
+
+            # ---------------------------------------
+            # Resize to MNIST size
+            # ---------------------------------------
+
             img = img.resize(
                 (28, 28),
                 Image.LANCZOS
             )
 
+
+            # ---------------------------------------
             # Convert to NumPy
+            # ---------------------------------------
+
             img_array = np.array(
                 img
             ).astype("float32") / 255.0
 
+
+            # ---------------------------------------
             # CNN input shape
+            # ---------------------------------------
+
             img_array = img_array.reshape(
-                1, 28, 28, 1
+                1,
+                28,
+                28,
+                1
             )
 
 
@@ -238,7 +264,9 @@ with col2:
             # Probability distribution
             # ---------------------------------------
 
-            st.markdown("### 📊 All Probabilities")
+            st.markdown(
+                "### 📊 All Probabilities"
+            )
 
             for i, p in enumerate(preds):
 
@@ -250,7 +278,7 @@ with col2:
         else:
 
             st.warning(
-                "Please draw a digit first!"
+                "Please upload an image first!"
             )
 
 
