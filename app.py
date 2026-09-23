@@ -238,22 +238,20 @@ with col2:
 
             result_html = f"""
             <div class="result-box">
-
                 <p style="margin-bottom:5px;">
                     Predicted Digit
                 </p>
-
+            
                 <p class="result-digit">
                     {digit}
                 </p>
-
+            
                 <p class="result-confidence">
                     Confidence: {confidence:.1f}%
                 </p>
-
             </div>
             """
-
+            
             st.markdown(
                 result_html,
                 unsafe_allow_html=True
