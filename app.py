@@ -1,7 +1,9 @@
 import streamlit as st
 import numpy as np
+import textwrap
 from tensorflow import keras
-from PIL import Image, ImageOps
+from PIL import Image
+
 
 # ---------------------------------------------------
 # Page config
@@ -80,29 +82,29 @@ st.markdown(
 # Header
 # ---------------------------------------------------
 
-html_temp = """
-<div style="
-    padding: 15px;
-    margin: 15px 0px;
-    background-color: #ffcc00;
-    border-radius: 10px;
-">
-    <h1 style="
-        color: black;
-        text-align: center;
-        margin: 0px;
+html_temp = textwrap.dedent("""
+    <div style="
+        padding: 15px;
+        margin: 15px 0px;
+        background-color: #ffcc00;
+        border-radius: 10px;
     ">
-        🔢 MNIST Digit Classifier
-    </h1>
-</div>
+        <h1 style="
+            color: black;
+            text-align: center;
+            margin: 0px;
+        ">
+            🔢 MNIST Digit Classifier
+        </h1>
+    </div>
 
-<h4 style="
-    text-align: center;
-    padding: 10px 0px;
-">
-    Upload an image of a handwritten digit and let our CNN classify it.
-</h4>
-"""
+    <h4 style="
+        text-align: center;
+        padding: 10px 0px;
+    ">
+        Upload an image of a handwritten digit and let our CNN classify it.
+    </h4>
+""")
 
 st.markdown(
     html_temp,
@@ -170,14 +172,14 @@ with col2:
         if uploaded_file is not None:
 
             # ---------------------------------------
-            # Open image
+            # Open uploaded image
             # ---------------------------------------
 
             img = Image.open(uploaded_file)
 
 
             # ---------------------------------------
-            # Convert image to grayscale
+            # Convert to grayscale
             # ---------------------------------------
 
             img = img.convert("L")
@@ -194,7 +196,7 @@ with col2:
 
 
             # ---------------------------------------
-            # Convert to NumPy
+            # Convert to NumPy array
             # ---------------------------------------
 
             img_array = np.array(
@@ -203,7 +205,7 @@ with col2:
 
 
             # ---------------------------------------
-            # CNN input shape
+            # Reshape for CNN
             # ---------------------------------------
 
             img_array = img_array.reshape(
@@ -233,25 +235,27 @@ with col2:
 
 
             # ---------------------------------------
-            # Display result
+            # Result box
             # ---------------------------------------
 
-            result_html = f"""
-            <div class="result-box">
-                <p style="margin-bottom:5px;">
-                    Predicted Digit
-                </p>
-            
-                <p class="result-digit">
-                    {digit}
-                </p>
-            
-                <p class="result-confidence">
-                    Confidence: {confidence:.1f}%
-                </p>
-            </div>
-            """
-            
+            result_html = textwrap.dedent(f"""
+                <div class="result-box">
+
+                    <p style="margin-bottom:5px;">
+                        Predicted Digit
+                    </p>
+
+                    <p class="result-digit">
+                        {digit}
+                    </p>
+
+                    <p class="result-confidence">
+                        Confidence: {confidence:.1f}%
+                    </p>
+
+                </div>
+            """)
+
             st.markdown(
                 result_html,
                 unsafe_allow_html=True
@@ -262,9 +266,7 @@ with col2:
             # Probability distribution
             # ---------------------------------------
 
-            st.markdown(
-                "### 📊 All Probabilities"
-            )
+            st.markdown("### 📊 All Probabilities")
 
             for i, p in enumerate(preds):
 
@@ -272,6 +274,7 @@ with col2:
                     float(p),
                     text=f"{i} → {p * 100:.1f}%"
                 )
+
 
         else:
 
