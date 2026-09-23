@@ -35,6 +35,7 @@ with col1:
         drawing_mode="freedraw",
         key="canvas",
         display_toolbar=True,
+        return_image_data=True
     )
 
 with col2:
